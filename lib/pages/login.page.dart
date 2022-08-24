@@ -30,20 +30,18 @@ class _LoginState extends State<Login> {
     var response = await UserApi.login(userRequest);
 
     if(response.statusCode == 201){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SolicitationsPage()),
-      );
       setState(() {
         loading = false;
         emailController.text = "";
         passwordController.text = "";
       });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SolicitationsPage()),
+      );
     }else if(response.statusCode == 403){
       setState(() {
         passwordController.text = "";
-      });
-      setState(() {
         loading = false;
       });
       invalidCredentials();

@@ -19,7 +19,9 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   late bool loading = true;
 
   late bool loadingSubmit = false;
+  late bool loadingClose  = false;
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController solutionDescriptionController = TextEditingController();
 
   getSolicitation() async {
@@ -72,12 +74,17 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   }
 
   resolveSolicitation() async {
+
+    setState(() {
+      loadingClose = true;
+    });
     var response =
         await SolicitationApi.resolveSolicitation(widget.solicitationId);
 
     if (response.statusCode == 200) {
       dialogMessage(true);
       setState(() {
+        loadingClose = false;
         getSolicitation();
       });
     } else {
@@ -143,13 +150,16 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
               const SizedBox(
                 height: 15,
               ),
-              TextFormField(
-                controller:  solutionDescriptionController,
-                style: const TextStyle(fontSize: 20),
-                decoration: const InputDecoration(
-                  hintStyle: TextStyle(fontSize: 20.0, color: Colors.black),
-                  errorStyle: TextStyle(color: Colors.black, fontSize: 18),
-                  hintText: 'Descrição',
+              Form(
+                key: _formKey,
+                child: TextFormField(
+                  controller:  solutionDescriptionController,
+                  style: const TextStyle(fontSize: 20),
+                  decoration: const InputDecoration(
+                    hintStyle: TextStyle(fontSize: 20.0, color: Colors.black),
+                    errorStyle: TextStyle(color: Colors.black, fontSize: 18),
+                    hintText: 'Descrição',
+                  ),
                 ),
               ),
               const SizedBox(
@@ -164,7 +174,9 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                       width: screenWidth * 0.3,
                       child: TextButton(
                           onPressed: () {
-                            createNewSolution();
+                            if(_formKey.currentState!.validate()){
+                              createNewSolution();
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             primary: Colors.green[900],
@@ -369,20 +381,28 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               SolicitationModel? resp = snapshot.data;
-              return Column(
-                children: [
-                  header(resp),
-                  sectorContainer(resp!),
-                  userContainer(resp),
-                  descriptionContainer(resp),
-                  solutionsContainer(resp),
-                  solutionsOptionsContainer(resp),
-                  createSolution(resp),
-                  closeSolicitations(resp),
-                ],
+              return Container(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  children: [
+                    header(resp),
+                    sectorContainer(resp!),
+                    userContainer(resp),
+                    descriptionContainer(resp),
+                    solutionsContainer(resp),
+                    solutionsOptionsContainer(resp),
+                    createSolution(resp),
+                    closeSolicitations(resp),
+                  ],
+                ),
               );
             } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
+              return SizedBox(
+                  height: MediaQuery.of(context).size.height / 1.3,
+                  child: const Center(
+                    child: Text("Não foi possível retornar dos dados", style: TextStyle(color: Colors.white, fontSize: 20),),
+                  )
+              );
             }
             return SizedBox(
               height: MediaQuery.of(context).size.height / 1.3,
@@ -668,7 +688,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                   onPressed: () {
                     resolveSolicitation();
                   },
-                  child: loading
+                  child: loadingClose
                       ? const CircularProgressIndicator(
                           valueColor:
                               AlwaysStoppedAnimation<Color>(Colors.white),

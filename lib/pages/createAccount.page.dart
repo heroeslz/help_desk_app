@@ -96,6 +96,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
     var response = await UserApi.createAccount(body);
 
+    print(response.body);
+
     if(response.statusCode == 412){
       setState(() {
         loadingCreate = false;
@@ -218,13 +220,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   Widget buildForm() {
     return Container(
       padding: const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 10.0),
+      alignment: Alignment.center,
       child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [circleImage(), form(), loginButton()],
-          ),
+        child: ListView(
+          children: [circleImage(), form(), loginButton()],
         ),
       ),
     );
@@ -269,8 +268,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         ),
         Form(
           key: _formKey,
-          child: ListView(
-            shrinkWrap: true,
+          child: Column(
             children: [
               nameField(),
               emailField(),
@@ -368,8 +366,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         validator: (String? value) {
           if (value!.isEmpty) {
             return 'Informe seu nome';
-          } else if (value.length < 5) {
-            return 'Nome deve ter mais de 5 caracteres';
+          } else if (value.length < 6) {
+            return 'Nome deve ter mais de 6 caracteres';
           }
           return null;
         },
@@ -409,8 +407,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         validator: (String? value) {
           if (value!.isEmpty) {
             return 'Informe uma senha';
-          } else if (value.length < 5) {
-            return 'Senha deve ter mais de 5 caracteres';
+          } else if (value.length < 6) {
+            return 'Senha deve ter mais de 6 caracteres';
           }
           return null;
         },

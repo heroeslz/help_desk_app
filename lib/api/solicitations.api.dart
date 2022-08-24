@@ -20,6 +20,9 @@ class SolicitationApi {
 
     final response = await http.get(url, headers: headers);
 
+
+    print(response.body);
+
     if (response.statusCode == 200) {
       var client = ResponseGetSolicitations.fromJson(jsonDecode(response.body));
       return client;
@@ -40,6 +43,10 @@ class SolicitationApi {
     };
 
     final response = await http.get(url, headers: headers);
+
+    print(response.body);
+
+
     if (response.statusCode == 200) {
       var solicitation =
           ResponseGetSolicitations.fromJson(jsonDecode(response.body));
@@ -61,6 +68,7 @@ class SolicitationApi {
     };
 
     final response = await http.get(url, headers: headers);
+
     if (response.statusCode == 200) {
       var solicitation = SolicitationModel.fromJson(jsonDecode(response.body));
       return solicitation;
@@ -100,6 +108,7 @@ class SolicitationApi {
 
     final response =
         await http.post(url, headers: headers, body: body);
+
     return response;
   }
 

@@ -1,10 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/solicitations.api.dart';
+import 'package:help_desck_app/globalVariable.dart';
 import 'package:help_desck_app/pages/createSolicitation.page.dart';
 import 'package:help_desck_app/pages/login.page.dart';
 import 'package:help_desck_app/pages/solicitationDetail.page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class SolicitationsPage extends StatefulWidget {
   const SolicitationsPage({Key? key}) : super(key: key);
@@ -15,22 +20,69 @@ class SolicitationsPage extends StatefulWidget {
 
 class _SolicitationsState extends State<SolicitationsPage> {
   late bool closeSolicitations = true;
+  late bool loadingData = false;
+
+  List solicitations = [];
 
   late int sizeList = 0;
-  late Future<dynamic> solicitations;
 
-  getSolicitationsOpen() {
+  Future<String> getSolicitationsOpen() async {
     setState(() {
+      loadingData = true;
       closeSolicitations = true;
-      solicitations = SolicitationApi.getSolicitationsOpen();
     });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var url = Uri.parse('${GlobalApi.url}/solicitation/open');
+    String? token = prefs.getString('access_token');
+
+    final headers = {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    };
+
+    var response = await http.get(url, headers: headers);
+
+    var resBody = json.decode(response.body);
+
+    setState(() {
+      solicitations = resBody["solicitations"];
+      loadingData = false;
+    });
+
+
+    print(solicitations);
+
+    return "soliciatationsOpen";
   }
 
-  getSolicitationsClose() {
+  Future<String> getSolicitationsClose() async {
     setState(() {
+      loadingData = true;
       closeSolicitations = false;
-      solicitations = SolicitationApi.getSolicitationsClose();
     });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var url = Uri.parse('${GlobalApi.url}/solicitation/close');
+    String? token = prefs.getString('access_token');
+
+    final headers = {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    };
+
+    var response = await http.get(url, headers: headers);
+
+    var resBody = json.decode(response.body);
+
+    setState(() {
+      solicitations = resBody["solicitations"];
+      loadingData = false;
+    });
+
+    print(solicitations);
+
+
+    return "soliciatationsOpen";
   }
 
   logout() async {
@@ -142,7 +194,8 @@ class _SolicitationsState extends State<SolicitationsPage> {
                         fontSize: 24,
                         fontWeight: FontWeight.w600),
                   ),
-                  Text(sizeList.toString(),
+                  Text(
+                    sizeList.toString(),
                     style: const TextStyle(color: Colors.white, fontSize: 24),
                   ),
                 ],
@@ -230,144 +283,126 @@ class _SolicitationsState extends State<SolicitationsPage> {
         height: screenHeight * 0.5,
         width: screenWidth * 0.96,
         alignment: Alignment.center,
-        child: FutureBuilder<dynamic>(
-          future: solicitations,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.solicitations.isNotEmpty) {
-                // setState(() {
-                //   sizeList = snapshot.data!.solicitations.length;
-                // });
-                return ListView.builder(
-                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    itemCount: snapshot.data!.solicitations.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      dynamic resp = snapshot.data!.solicitations[index];
-                      return Card(
-                          color: const Color(0xff333533),
-                          elevation: 1,
-                          child: ClipPath(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(
-                                      color: closeSolicitations
-                                          ? const Color(0xfffca311)
-                                          : Colors.green,
-                                      width: 5),
-                                ),
+        child: loadingData
+            ? SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                itemCount: solicitations.length,
+                itemBuilder: (BuildContext context, int index) {
+                  if (solicitations.isNotEmpty) {
+                    return Card(
+                        color: const Color(0xff333533),
+                        elevation: 1,
+                        child: ClipPath(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                left: BorderSide(
+                                    color: closeSolicitations
+                                        ? const Color(0xfffca311)
+                                        : Colors.green,
+                                    width: 5),
                               ),
-                              child: ListTile(
-                                onTap: () => {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            SolicitationDetailPage(
-                                              solicitationId:
-                                                  resp["solicitation_id"],
-                                            )),
-                                  ),
-                                },
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0.0, 8.0, 0.0, 2.0),
-                                      child: Text(
-                                        "Setor ${resp["sector"]["name"]} - ${resp["code"]}",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                    Text(
-                                      resp["description"],
+                            ),
+                            child: ListTile(
+                              onTap: () => {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          SolicitationDetailPage(
+                                            solicitationId: solicitations[index]
+                                                ["solicitation_id"],
+                                          )),
+                                ),
+                              },
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        0.0, 8.0, 0.0, 2.0),
+                                    child: Text(
+                                      "Setor ${solicitations[index]["sector"]["name"]} - ${solicitations[index]["code"]}",
                                       style:
                                           const TextStyle(color: Colors.white),
                                     ),
-                                  ],
-                                ),
-                                subtitle: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        0.0, 10.0, 0.6, 10.0),
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 10.0),
-                                          child: Icon(Icons.timelapse_rounded,
-                                              color: closeSolicitations
-                                                  ? const Color(0xfffca311)
-                                                  : Colors.green),
-                                        ),
-                                        Text(
-                                          "${formatDate(resp["created_at"])} às ${formatHour(resp["created_at"])}",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 19),
-                                        ),
-                                      ],
-                                    )),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundColor: const Color(0xff495057),
-                                      child: IconButton(
-                                        icon: Icon(
-                                          closeSolicitations
-                                              ? Icons.hourglass_bottom
-                                              : Icons.check_circle,
-                                          color: closeSolicitations
-                                              ? const Color(0xfffca311)
-                                              : Colors.green,
-                                        ),
-                                        onPressed: () {},
+                                  ),
+                                  Text(
+                                    solicitations[index]["description"],
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      0.0, 10.0, 0.6, 10.0),
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 10.0),
+                                        child: Icon(Icons.timelapse_rounded,
+                                            color: closeSolicitations
+                                                ? const Color(0xfffca311)
+                                                : Colors.green),
                                       ),
+                                      Text(
+                                        "${formatDate(solicitations[index]["created_at"])} às ${formatHour(solicitations[index]["created_at"])}",
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 19),
+                                      ),
+                                    ],
+                                  )),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30,
+                                    backgroundColor: const Color(0xff495057),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        closeSolicitations
+                                            ? Icons.hourglass_bottom
+                                            : Icons.check_circle,
+                                        color: closeSolicitations
+                                            ? const Color(0xfffca311)
+                                            : Colors.green,
+                                      ),
+                                      onPressed: () {},
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ));
-                    });
-              } else {
-                return _showContainer();
-              }
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
-            return SizedBox(
-              height: MediaQuery.of(context).size.height / 1.3,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          },
-        ));
-  }
-
-  Widget _showContainer() {
-    return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: const[
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              'Sem solicitações',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 30,
-                color: Color.fromARGB(255, 103, 101, 101),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+                          ),
+                        ));
+                  } else {
+                    return Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text(
+                              'Sem solicitações',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 30,
+                                color: Color.fromARGB(255, 103, 101, 101),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  }
+                }));
   }
 }

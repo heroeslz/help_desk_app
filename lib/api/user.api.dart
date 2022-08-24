@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:help_desck_app/globalVariable.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,7 @@ class UserApi {
   static Future<Response> login(UserRequest userRequest) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
 
-    var url = Uri.parse('http://192.168.15.8:3000/auth');
+    var url = Uri.parse('${GlobalApi.url}/auth');
 
     final response = await http.post(
       url,
@@ -28,7 +29,8 @@ class UserApi {
   }
 
   static Future<Response> createAccount(UserModel userRequest) async {
-    var url = Uri.parse('http://192.168.15.8:3000/user');
+
+    var url = Uri.parse('${GlobalApi.url}/user');
 
     var body = jsonEncode(userRequest);
 
