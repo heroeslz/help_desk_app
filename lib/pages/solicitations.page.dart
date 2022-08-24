@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:help_desck_app/api/solicitations.api.dart';
 import 'package:help_desck_app/globalVariable.dart';
 import 'package:help_desck_app/pages/createSolicitation.page.dart';
 import 'package:help_desck_app/pages/login.page.dart';
@@ -42,7 +40,6 @@ class _SolicitationsState extends State<SolicitationsPage> {
     };
 
     var response = await http.get(url, headers: headers);
-
     var resBody = json.decode(response.body);
 
     setState(() {
@@ -50,9 +47,7 @@ class _SolicitationsState extends State<SolicitationsPage> {
       loadingData = false;
     });
 
-
     print(solicitations);
-
     return "soliciatationsOpen";
   }
 
@@ -71,17 +66,13 @@ class _SolicitationsState extends State<SolicitationsPage> {
     };
 
     var response = await http.get(url, headers: headers);
-
     var resBody = json.decode(response.body);
 
     setState(() {
       solicitations = resBody["solicitations"];
       loadingData = false;
     });
-
     print(solicitations);
-
-
     return "soliciatationsOpen";
   }
 
@@ -240,8 +231,7 @@ class _SolicitationsState extends State<SolicitationsPage> {
                       'EM ANDAMENTO',
                       style: TextStyle(
                           fontSize: 16,
-                          color:
-                              closeSolicitations ? Colors.green : Colors.white),
+                          color: closeSolicitations ? Colors.green : Colors.white),
                     ),
                   ))),
           Container(
