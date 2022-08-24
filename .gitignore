@@ -48,4 +48,4 @@ app.*.map.json
 
 
 # URl API PROD
-./lib/globalVariable.dart
+lib/globalVariable.dart
