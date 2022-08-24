@@ -44,10 +44,14 @@ class _SolicitationsState extends State<SolicitationsPage> {
 
     setState(() {
       solicitations = resBody["solicitations"];
+      sizeList = resBody["totalSize"];
       loadingData = false;
     });
 
     print(solicitations);
+    if (solicitations.isEmpty) {
+      print("vazuo");
+    }
     return "soliciatationsOpen";
   }
 
@@ -70,9 +74,10 @@ class _SolicitationsState extends State<SolicitationsPage> {
 
     setState(() {
       solicitations = resBody["solicitations"];
+      sizeList = resBody["totalSize"];
       loadingData = false;
     });
-    print(solicitations);
+
     return "soliciatationsOpen";
   }
 
@@ -99,14 +104,14 @@ class _SolicitationsState extends State<SolicitationsPage> {
   }
 
   formatDate(_date) {
-    var inputFormat = DateFormat('yyyy-MM-dd');
+    var inputFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
     var inputDate = inputFormat.parse(_date);
     var outputFormat = DateFormat('dd/MM/yyyy');
     return outputFormat.format(inputDate);
   }
 
   formatHour(_date) {
-    var inputFormat = DateFormat('yyyy-MM-ddTHH:mm');
+    var inputFormat = DateFormat('yyyy-MM-ddTHH:mm:ss');
     var inputDate = inputFormat.parse(_date);
     var outputFormat = DateFormat('HH:mm');
     return outputFormat.format(inputDate);
@@ -231,7 +236,8 @@ class _SolicitationsState extends State<SolicitationsPage> {
                       'EM ANDAMENTO',
                       style: TextStyle(
                           fontSize: 16,
-                          color: closeSolicitations ? Colors.green : Colors.white),
+                          color:
+                              closeSolicitations ? Colors.green : Colors.white),
                     ),
                   ))),
           Container(
@@ -280,119 +286,121 @@ class _SolicitationsState extends State<SolicitationsPage> {
                   child: CircularProgressIndicator(),
                 ),
               )
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                itemCount: solicitations.length,
-                itemBuilder: (BuildContext context, int index) {
-                  if (solicitations.isNotEmpty) {
-                    return Card(
-                        color: const Color(0xff333533),
-                        elevation: 1,
-                        child: ClipPath(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                    color: closeSolicitations
-                                        ? const Color(0xfffca311)
-                                        : Colors.green,
-                                    width: 5),
-                              ),
-                            ),
-                            child: ListTile(
-                              onTap: () => {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          SolicitationDetailPage(
-                                            solicitationId: solicitations[index]
-                                                ["solicitation_id"],
-                                          )),
-                                ),
-                              },
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        0.0, 8.0, 0.0, 2.0),
-                                    child: Text(
-                                      "Setor ${solicitations[index]["sector"]["name"]} - ${solicitations[index]["code"]}",
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  Text(
-                                    solicitations[index]["description"],
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      0.0, 10.0, 0.6, 10.0),
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 10.0),
-                                        child: Icon(Icons.timelapse_rounded,
-                                            color: closeSolicitations
-                                                ? const Color(0xfffca311)
-                                                : Colors.green),
-                                      ),
-                                      Text(
-                                        "${formatDate(solicitations[index]["created_at"])} às ${formatHour(solicitations[index]["created_at"])}",
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 19),
-                                      ),
-                                    ],
-                                  )),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: const Color(0xff495057),
-                                    child: IconButton(
-                                      icon: Icon(
-                                        closeSolicitations
-                                            ? Icons.hourglass_bottom
-                                            : Icons.check_circle,
-                                        color: closeSolicitations
-                                            ? const Color(0xfffca311)
-                                            : Colors.green,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                ],
-                              ),
+            : Container(
+                child: solicitations.isEmpty
+                    ? Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(16.0),
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            'Sem solicitações',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 30,
+                              color: Color.fromARGB(255, 103, 101, 101),
                             ),
                           ),
-                        ));
-                  } else {
-                    return Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              'Sem solicitações',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 30,
-                                color: Color.fromARGB(255, 103, 101, 101),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  }
-                }));
+                        )
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                        itemCount: solicitations.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Card(
+                              color: const Color(0xff333533),
+                              elevation: 1,
+                              child: ClipPath(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      left: BorderSide(
+                                          color: closeSolicitations
+                                              ? const Color(0xfffca311)
+                                              : Colors.green,
+                                          width: 5),
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    onTap: () => {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SolicitationDetailPage(
+                                                  solicitationId:
+                                                      solicitations[index]
+                                                          ["solicitation_id"],
+                                                )),
+                                      ),
+                                    },
+                                    title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0.0, 8.0, 0.0, 2.0),
+                                          child: Text(
+                                            "Setor ${solicitations[index]["sector"]["name"]} - ${solicitations[index]["code"]}",
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                        Text(
+                                          solicitations[index]["description"],
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                    subtitle: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0.0, 10.0, 0.6, 10.0),
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10.0),
+                                              child: Icon(
+                                                  Icons.timelapse_rounded,
+                                                  color: closeSolicitations
+                                                      ? const Color(0xfffca311)
+                                                      : Colors.green),
+                                            ),
+                                            Text(
+                                              "${formatDate(solicitations[index]["created_at"])} às ${formatHour(solicitations[index]["created_at"])}",
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 19),
+                                            ),
+                                          ],
+                                        )),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor:
+                                              const Color(0xff495057),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              closeSolicitations
+                                                  ? Icons.hourglass_bottom
+                                                  : Icons.check_circle,
+                                              color: closeSolicitations
+                                                  ? const Color(0xfffca311)
+                                                  : Colors.green,
+                                            ),
+                                            onPressed: () {},
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ));
+                        }),
+              ));
   }
 }

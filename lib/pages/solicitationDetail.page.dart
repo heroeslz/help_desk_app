@@ -35,6 +35,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
     setState(() {
       loadingSubmit = true;
     });
+
     SolutionCreateModel solution = SolutionCreateModel();
     SolicitationModel solicitationModel = SolicitationModel();
     solution.description = solutionDescriptionController.text;
@@ -46,9 +47,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
       setState(() {
         solutionDescriptionController.text = "";
         loadingSubmit = false;
-      });
 
-      setState(() {
         Fluttertoast.showToast(
           msg: 'Solução criada com sucesso!',
           toastLength: Toast.LENGTH_SHORT,
@@ -58,9 +57,14 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
           fontSize: 16.0,
         );
       });
+
       Navigator.pop(context);
       getSolicitation();
     } else {
+      setState(() {
+        solutionDescriptionController.text = "";
+        loadingSubmit = false;
+      });
       Fluttertoast.showToast(
         msg: 'Não foi possível criar a solução',
         toastLength: Toast.LENGTH_SHORT,
@@ -74,12 +78,11 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   }
 
   resolveSolicitation() async {
-
     setState(() {
       loadingClose = true;
     });
-    var response =
-        await SolicitationApi.resolveSolicitation(widget.solicitationId);
+
+    var response = await SolicitationApi.resolveSolicitation(widget.solicitationId);
 
     if (response.statusCode == 200) {
       dialogMessage(true);
@@ -88,6 +91,9 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
         getSolicitation();
       });
     } else {
+      setState(() {
+        loadingClose = false;
+      });
       dialogMessage(false);
     }
   }
@@ -160,6 +166,14 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                     errorStyle: TextStyle(color: Colors.black, fontSize: 18),
                     hintText: 'Descrição',
                   ),
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Informe seu nome';
+                    } else if (value.length < 6) {
+                      return 'Deve ter mais de 6 caracteres';
+                    }
+                    return null;
+                  },
                 ),
               ),
               const SizedBox(
@@ -170,9 +184,11 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    SizedBox(
+                    Container(
                       width: screenWidth * 0.3,
-                      child: TextButton(
+                      height: 45,
+                      padding: const EdgeInsets.all(2),
+                      child: ElevatedButton(
                           onPressed: () {
                             if(_formKey.currentState!.validate()){
                               createNewSolution();
@@ -181,15 +197,23 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                           style: ElevatedButton.styleFrom(
                             primary: Colors.green[900],
                           ),
-                          child: const Text(
+                          child: loadingSubmit ? const SizedBox(
+                            child: CircularProgressIndicator( valueColor: AlwaysStoppedAnimation<Color>(Colors.white), strokeWidth: 2.0),
+                            height: 14,
+                            width: 14,
+                          ) :  const Text(
                             "Salvar",
                             style: TextStyle(fontSize: 18, color: Colors.white),
-                          )),
+                          )
+                      ),
                     ),
-                    SizedBox(
+                    Container(
+                      padding: const EdgeInsets.all(2),
                       width: screenWidth * 0.3,
-                      child: TextButton(
+                      height: 45,
+                      child: ElevatedButton(
                           onPressed: () {
+                            loadingSubmit ? null :
                             Navigator.of(context).pop();
                             setState(() {
                               solutionDescriptionController.text = "";
