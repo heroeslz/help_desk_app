@@ -47,15 +47,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   }
 
   Widget selectSector(context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeigth = MediaQuery.of(context).size.height;
-    return Container(
-      width: screenWidth,
-      constraints: BoxConstraints(maxHeight: screenHeigth * 0.5),
-      alignment: Alignment.center,
+    return SizedBox(
+      height: 200.0,
+      width: 400.0,
       child: ListView.builder(
-        shrinkWrap: true,
         itemCount: data.length,
+        shrinkWrap: true, // <-- Set this to true
         itemBuilder: (BuildContext context, int index) {
           dynamic resp = data[index];
           return RadioListTile<dynamic>(
@@ -223,7 +220,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       alignment: Alignment.center,
       child: Center(
         child: ListView(
-          children: [circleImage(), form(), loginButton()],
+          children: [circleImage(), form(), loginButton(), loginPage()],
         ),
       ),
     );
@@ -426,7 +423,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                // backgroundColor: Colors.grey,
+                scrollable: true,
                 title: const Text('Setor'),
                 content: selectSector(context),
               );
@@ -469,7 +466,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
         width: screenWidth,
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
         padding: const EdgeInsets.all(10),
         alignment: Alignment.center,
         child: SizedBox(
@@ -493,5 +490,25 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       style: TextStyle(fontSize: 20),
                     ),
             )));
+  }
+
+  Widget loginPage() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+        width: screenWidth,
+        alignment: Alignment.center,
+        child: TextButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.transparent,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Login()),
+            );
+          },
+          child: const Text('Fazer login', style: TextStyle(fontSize: 20, color: Colors.white),),
+        )
+    );
   }
 }

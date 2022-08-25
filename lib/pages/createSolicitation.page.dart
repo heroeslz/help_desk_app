@@ -150,39 +150,11 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     getSectors();
   }
 
-  Widget selectSector (context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeigth = MediaQuery.of(context).size.height;
-    return Container(
-      width: screenWidth,
-      constraints: BoxConstraints(maxHeight: screenHeigth * 0.5),
-      alignment: Alignment.center,
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: data.length,
-        itemBuilder: (BuildContext context, int index) {
-          dynamic resp = data[index];
-          return RadioListTile<dynamic>(
-            title: Text(resp["name"]),
-            value: resp,
-            groupValue: sectorModelSelected,
-            onChanged: (dynamic value) {
-              setState(() {
-                sectorModelSelected = value;
-                sectorController.text = value["name"];
-                Navigator.pop(context);
-              });
-            },
-          );
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      resizeToAvoidBottomInset: false, //floatingActionButtonLocation fixed on bottom
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -208,7 +180,7 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
           )  : buildForm()
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
           width: screenWidth,
           padding: const EdgeInsets.all(10),
@@ -233,11 +205,8 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
   }
 
   Widget buildForm() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        form(),
-      ],
+    return SingleChildScrollView(
+      child: form(),
     );
   }
 
@@ -246,7 +215,7 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
       key: _formKey,
       child: ListView(
         shrinkWrap: true,
-        children: [descriptionField(), sectorField()],
+        children: [sectorField(), descriptionField()],
       ),
     );
   }
@@ -257,6 +226,7 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
       child: TextFormField(
         controller: descriptionController,
         style: const TextStyle(color: Colors.white),
+        maxLines: 8,
         decoration: InputDecoration(
           hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
           fillColor: const Color.fromARGB(80, 0, 0, 0),
@@ -288,7 +258,34 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     );
   }
 
+  Widget containerSector(context){
+    return SizedBox(
+      height: 200.0,
+      width: 400.0,
+      child: ListView.builder(
+        itemCount: data.length,
+        shrinkWrap: true, // <-- Set this to true
+        itemBuilder: (BuildContext context, int index) {
+          dynamic resp = data[index];
+          return RadioListTile<dynamic>(
+            title: Text(resp["name"]),
+            value: resp,
+            groupValue: sectorModelSelected,
+            onChanged: (dynamic value) {
+              setState(() {
+                sectorModelSelected = value;
+                sectorController.text = value["name"];
+                Navigator.pop(context);
+              });
+            },
+          );
+        },
+      ),
+    );
+  }
+
   Widget sectorField() {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
       child: TextFormField(
@@ -298,9 +295,9 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                // backgroundColor: Colors.grey,
+                scrollable: true,
                 title: const Text('Setor onde está o problema'),
-                content: selectSector(context),
+                content: containerSector(context)
               );
             }),
         style: const TextStyle(color: Colors.white),

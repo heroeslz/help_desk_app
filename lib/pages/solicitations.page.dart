@@ -48,10 +48,6 @@ class _SolicitationsState extends State<SolicitationsPage> {
       loadingData = false;
     });
 
-    print(solicitations);
-    if (solicitations.isEmpty) {
-      print("vazuo");
-    }
     return "soliciatationsOpen";
   }
 

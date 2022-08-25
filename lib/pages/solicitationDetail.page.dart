@@ -18,7 +18,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   late Future<SolicitationModel> solicitation;
   late bool loading = true;
 
-  late bool loadingSubmit = false;
+  bool loadingSubmit = false;
   late bool loadingClose  = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -248,14 +248,13 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
     );
   }
 
-
   contentBox(context, bool success) {
-    double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       children: <Widget>[
         Container(
+          padding: const EdgeInsets.only(
+              left: 20, top: 45 + 20, right: 20, bottom: 20),
           margin: const EdgeInsets.only(top: 45),
-          width: screenWidth,
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
@@ -268,17 +267,14 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                success ? "Sucesso" : "Atenção!",
-                style:
-                    const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                success ? 'Sucesso!' : 'Atenção',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 15,
               ),
               Text(
-                success
-                    ? "Solicitação finalizada com sucesso!"
-                    : "Não foi possível encerrar esta solicitação",
+                success ? "Solicitação finalizada com sucesso!" : 'Não foi possível encerrar esta solicitação',
                 style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
@@ -307,8 +303,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
             radius: 45,
             child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(45)),
-                child: Image.asset(
-                    success ? "assets/success.png" : "assets/close.png")),
+                child: success ? Image.asset("assets/success.png") : Image.asset("assets/close.png")),
           ),
         )
       ],
@@ -745,15 +740,10 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                   onPressed: () {
                     dialogCreateSolution();
                   },
-                  child: loading
-                      ? const CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        )
-                      : const Text(
-                          'Sugerir uma solução',
-                          style: TextStyle(fontSize: 20),
-                        ),
+                  child: const Text(
+                    'Sugerir uma solução',
+                    style: TextStyle(fontSize: 20),
+                  ),
                 )))
         : const SizedBox(
             width: 0.0,
