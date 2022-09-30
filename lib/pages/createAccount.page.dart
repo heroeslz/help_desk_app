@@ -19,7 +19,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   late bool loadingCreate = false;
 
-
   late bool comunUser = true;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
@@ -83,8 +82,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       loadingCreate = true;
     });
 
-    UserModel body =  UserModel();
-    SectorModel sectorModel = SectorModel(sector_id: sectorModelSelected["sector_id"], name: sectorModelSelected["name"]);
+    UserModel body = UserModel();
+    SectorModel sectorModel = SectorModel(
+        sector_id: sectorModelSelected["sector_id"],
+        name: sectorModelSelected["name"]);
     body.sector = sectorModel;
     body.email = emailController.text;
     body.password = passwordController.text;
@@ -95,14 +96,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
     print(response.body);
 
-    if(response.statusCode == 412){
+    if (response.statusCode == 412) {
       setState(() {
         loadingCreate = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email já cadastrado')));
-    }else if(response.statusCode == 201){
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Email já cadastrado')));
+    } else if (response.statusCode == 201) {
       setState(() {
         loadingCreate = false;
       });
@@ -272,7 +273,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               passwordField(),
               sectorField(),
               SwitchListTile(
-                title: const Text('Usuário comum', style: TextStyle(color: Colors.white),),
+                title: const Text(
+                  'Usuário comum',
+                  style: TextStyle(color: Colors.white),
+                ),
                 value: comunUser,
                 onChanged: (bool value) {
                   setState(() {
@@ -477,7 +481,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 primary: Colors.lightGreen[900],
               ),
               onPressed: () {
-                if(_formKey.currentState!.validate()){
+                if (_formKey.currentState!.validate()) {
                   createAccount();
                 }
               },
@@ -507,8 +511,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               MaterialPageRoute(builder: (context) => const Login()),
             );
           },
-          child: const Text('Fazer login', style: TextStyle(fontSize: 20, color: Colors.white),),
-        )
-    );
+          child: const Text(
+            'Fazer login',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ));
   }
 }

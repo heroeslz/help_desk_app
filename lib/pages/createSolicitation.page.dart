@@ -52,8 +52,6 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     body.sector = sectorModel;
 
     var response = await SolicitationApi.create(body);
-
-
     if(response.statusCode == 201) {
       setState(() {
         loadingCreate = false;
@@ -65,7 +63,7 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
   void successDialog() async {
     return showDialog<void>(
         context: context,
-        barrierDismissible: true, // user must tap button!
+        barrierDismissible: true,
         builder: (BuildContext context) {
           return Dialog(
             shape: RoundedRectangleBorder(
@@ -258,34 +256,7 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     );
   }
 
-  Widget containerSector(context){
-    return SizedBox(
-      height: 200.0,
-      width: 400.0,
-      child: ListView.builder(
-        itemCount: data.length,
-        shrinkWrap: true, // <-- Set this to true
-        itemBuilder: (BuildContext context, int index) {
-          dynamic resp = data[index];
-          return RadioListTile<dynamic>(
-            title: Text(resp["name"]),
-            value: resp,
-            groupValue: sectorModelSelected,
-            onChanged: (dynamic value) {
-              setState(() {
-                sectorModelSelected = value;
-                sectorController.text = value["name"];
-                Navigator.pop(context);
-              });
-            },
-          );
-        },
-      ),
-    );
-  }
-
   Widget sectorField() {
-    double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
       child: TextFormField(
@@ -294,10 +265,13 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
         onTap: () => showDialog(
             context: context,
             builder: (BuildContext context) {
-              return AlertDialog(
-                scrollable: true,
-                title: const Text('Setor onde está o problema'),
-                content: containerSector(context)
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                child: containerSector(context),
               );
             }),
         style: const TextStyle(color: Colors.white),
@@ -327,6 +301,56 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
           return null;
         },
       ),
+    );
+  }
+
+  Widget containerSector(context){
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Stack(
+      clipBehavior: Clip.none,
+      fit: StackFit.loose,
+      children: [
+        Container(
+          width: screenWidth,
+          height: 300,
+          padding: const EdgeInsets.only(
+              left: 20, top: 20, right: 20, bottom: 20),
+          decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: const Color(0xFF22223b),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
+              ]
+          ),
+          child: Column(
+            children: [
+              const Padding(padding: EdgeInsets.all(10), child: Text("Selecione o setor",
+                style: TextStyle(color: Colors.white, fontSize: 20.0),),),
+              ListView.builder(
+                itemCount: data.length,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  dynamic resp = data[index];
+                  return RadioListTile<dynamic>(
+                    title: Text(resp["name"], style: const TextStyle(color: Colors.white),),
+                    value: resp,
+                    groupValue: sectorModelSelected,
+                    onChanged: (dynamic value) {
+                      setState(() {
+                        sectorModelSelected = value;
+                        sectorController.text = value["name"];
+                        Navigator.pop(context);
+                      });
+                    },
+                  );
+                },
+              ),
+            ],
+          )
+        ),
+      ],
     );
   }
 }

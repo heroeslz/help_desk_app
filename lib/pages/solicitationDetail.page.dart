@@ -47,9 +47,8 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
       setState(() {
         solutionDescriptionController.text = "";
         loadingSubmit = false;
-
         Fluttertoast.showToast(
-          msg: 'Solução criada com sucesso!',
+          msg: 'Solução adicionada com sucesso!',
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.black,
@@ -66,7 +65,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
         loadingSubmit = false;
       });
       Fluttertoast.showToast(
-        msg: 'Não foi possível criar a solução',
+        msg: 'Não foi possível adicionar a solução',
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.black,
@@ -133,25 +132,29 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   contentBoxCreateSolution(context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
+      clipBehavior: Clip.none,
+      fit: StackFit.loose,
       children: <Widget>[
         Container(
+          width: screenWidth,
+          height: 300,
           padding: const EdgeInsets.only(
-              left: 20, top: 45 + 20, right: 20, bottom: 20),
-          margin: const EdgeInsets.only(top: 45),
+              left: 20, top: 20, right: 20, bottom: 20),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Colors.white,
+              color: const Color(0xFF22223b),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(
                     color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
-              ]),
+              ]
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text(
                 "Nova solução",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
               ),
               const SizedBox(
                 height: 15,
@@ -159,12 +162,27 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
               Form(
                 key: _formKey,
                 child: TextFormField(
+                  maxLines: 5,
                   controller:  solutionDescriptionController,
-                  style: const TextStyle(fontSize: 20),
-                  decoration: const InputDecoration(
-                    hintStyle: TextStyle(fontSize: 20.0, color: Colors.black),
-                    errorStyle: TextStyle(color: Colors.black, fontSize: 18),
-                    hintText: 'Descrição',
+                  style: const TextStyle(fontSize: 20, color: Colors.white),
+                  decoration: InputDecoration(
+                    hintStyle: const TextStyle(fontSize: 18.0, color: Colors.white),
+                    fillColor: const Color.fromARGB(80, 0, 0, 0),
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Colors.transparent),
+                    ),
+                    errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+                    ),
+                    hintText: 'Você deve informar uma solução para o problema',
                   ),
                   validator: (String? value) {
                     if (value!.isEmpty) {
@@ -177,18 +195,16 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                 ),
               ),
               const SizedBox(
-                height: 22,
+                height: 10,
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Row(
+               Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
                       width: screenWidth * 0.3,
                       height: 45,
                       padding: const EdgeInsets.all(2),
-                      child: ElevatedButton(
+                      child: TextButton(
                           onPressed: () {
                             if(_formKey.currentState!.validate()){
                               createNewSolution();
@@ -211,7 +227,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                       padding: const EdgeInsets.all(2),
                       width: screenWidth * 0.3,
                       height: 45,
-                      child: ElevatedButton(
+                      child: TextButton(
                           onPressed: () {
                             loadingSubmit ? null :
                             Navigator.of(context).pop();
@@ -229,21 +245,9 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                     )
                   ],
                 )
-              ),
             ],
           ),
         ),
-        Positioned(
-          left: 20,
-          right: 20,
-          child: CircleAvatar(
-            backgroundColor: Colors.transparent,
-            radius: 45,
-            child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(45)),
-                child: Image.asset("assets/success.png")),
-          ),
-        )
       ],
     );
   }
