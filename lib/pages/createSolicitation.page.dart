@@ -177,7 +177,6 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      //floatingActionButtonLocation fixed on bottom
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,

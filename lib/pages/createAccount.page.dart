@@ -46,28 +46,56 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   }
 
   Widget selectSector(context) {
-    return SizedBox(
-      height: 200.0,
-      width: 400.0,
-      child: ListView.builder(
-        itemCount: data.length,
-        shrinkWrap: true, // <-- Set this to true
-        itemBuilder: (BuildContext context, int index) {
-          dynamic resp = data[index];
-          return RadioListTile<dynamic>(
-            title: Text(resp["name"]),
-            value: resp,
-            groupValue: sectorModelSelected,
-            onChanged: (dynamic value) {
-              setState(() {
-                sectorModelSelected = value;
-                sectorController.text = value["name"];
-                Navigator.pop(context);
-              });
-            },
-          );
-        },
-      ),
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Stack(
+      children: [
+        Container(
+          width: screenWidth,
+          height: 300,
+          padding:
+          const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+          decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: const Color(0xFF22223b),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                    color: Colors.black,
+                    offset: Offset(0, 10),
+                    blurRadius: 10),
+              ]),
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  "Selecione o setor",
+                  style: TextStyle(color: Colors.white, fontSize: 20.0),
+                ),
+              ),
+              ListView.builder(
+                itemCount: data.length,
+                shrinkWrap: true, // <-- Set this to true
+                itemBuilder: (BuildContext context, int index) {
+                  dynamic resp = data[index];
+                  return RadioListTile<dynamic>(
+                    title: Text(resp["name"], style: const TextStyle(color: Colors.white),),
+                    value: resp,
+                    groupValue: sectorModelSelected,
+                    onChanged: (dynamic value) {
+                      setState(() {
+                        sectorModelSelected = value;
+                        sectorController.text = value["name"];
+                        Navigator.pop(context);
+                      });
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        )
+      ],
     );
   }
 
@@ -128,15 +156,18 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   }
 
   contentBox(context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       children: <Widget>[
         Container(
+          width: screenWidth,
+          height: 250,
           padding: const EdgeInsets.only(
               left: 20, top: 45 + 20, right: 20, bottom: 20),
           margin: const EdgeInsets.only(top: 45),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Colors.white,
+              color: const Color(0xFF22223b),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(
@@ -147,34 +178,51 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             children: <Widget>[
               const Text(
                 "Sucesso!",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
               ),
               const SizedBox(
                 height: 15,
               ),
               const Text(
                 "Conta criada com sucesso!",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 20, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(
                 height: 22,
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
-                    },
-                    child: const Text(
-                      "Fazer login",
-                      style: TextStyle(fontSize: 18),
-                    )),
-              ),
+              Container(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    height: 40,
+                    width: screenWidth * 0.5,
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: Colors.green,
+                          shadowColor: Colors.green[900],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          elevation: 5,
+                          textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const Login()),
+                          );
+                        },
+                        child: const Text(
+                          "Fazer login",
+                          style: TextStyle(fontSize: 18),
+                        )),
+                  )
+              )
             ],
           ),
         ),
@@ -426,10 +474,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         onTap: () => showDialog(
             context: context,
             builder: (BuildContext context) {
-              return AlertDialog(
-                scrollable: true,
-                title: const Text('Setor'),
-                content: selectSector(context),
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                child: selectSector(context),
               );
             }),
         style: const TextStyle(color: Colors.white),
