@@ -253,15 +253,20 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   }
 
   contentBox(context, bool success) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
+      clipBehavior: Clip.none,
+      fit: StackFit.loose,
       children: <Widget>[
         Container(
+          width: screenWidth,
+          height: 250,
           padding: const EdgeInsets.only(
               left: 20, top: 45 + 20, right: 20, bottom: 20),
           margin: const EdgeInsets.only(top: 45),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Colors.white,
+              color: const Color(0xFF22223b),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(
@@ -272,30 +277,47 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
             children: <Widget>[
               Text(
                 success ? 'Sucesso!' : 'Atenção',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
               ),
               const SizedBox(
                 height: 15,
               ),
               Text(
                 success ? "Solicitação finalizada com sucesso!" : 'Não foi possível encerrar esta solicitação',
-                style: const TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(
                 height: 22,
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      "Fechar",
-                      style: TextStyle(fontSize: 18),
-                    )),
-              ),
+             Container(
+               alignment: Alignment.center,
+               child: SizedBox(
+                 height: 40,
+                 width: screenWidth * 0.5,
+                 child: TextButton(
+                     style: TextButton.styleFrom(
+                       primary: Colors.white,
+                       backgroundColor: Colors.green,
+                       shadowColor: Colors.green[900],
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(28),
+                       ),
+                       elevation: 5,
+                       textStyle: const TextStyle(
+                           color: Colors.white,
+                           fontSize: 30,
+                           fontWeight: FontWeight.w600),
+                     ),
+                     onPressed: () {
+                       Navigator.of(context).pop();
+                     },
+                     child: const Text(
+                       "Fechar",
+                       style: TextStyle(fontSize: 18),
+                     )),
+               )
+             )
             ],
           ),
         ),

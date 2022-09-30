@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/sector.api.dart';
 import 'package:help_desck_app/api/solicitations.api.dart';
@@ -47,12 +46,14 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     });
 
     SolicitationCreateModel body = SolicitationCreateModel();
-    SectorModel sectorModel = SectorModel(sector_id: sectorModelSelected["sector_id"], name: sectorModelSelected["name"]);
+    SectorModel sectorModel = SectorModel(
+        sector_id: sectorModelSelected["sector_id"],
+        name: sectorModelSelected["name"]);
     body.description = descriptionController.text;
     body.sector = sectorModel;
 
     var response = await SolicitationApi.create(body);
-    if(response.statusCode == 201) {
+    if (response.statusCode == 201) {
       setState(() {
         loadingCreate = false;
       });
@@ -77,53 +78,76 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
   }
 
   contentBox(context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
+      clipBehavior: Clip.none,
+      fit: StackFit.loose,
       children: <Widget>[
         Container(
+          width: screenWidth,
+          height: 250,
           padding: const EdgeInsets.only(
               left: 20, top: 45 + 20, right: 20, bottom: 20),
           margin: const EdgeInsets.only(top: 45),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Colors.white,
+              color: const Color(0xFF22223b),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(
                     color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
               ]),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text(
                 "Sucesso!",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white),
               ),
               const SizedBox(
                 height: 15,
               ),
               const Text(
                 "Solicitação criada com sucesso!",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 22, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(
                 height: 22,
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SolicitationsPage()),
-                      );
-                    },
-                    child: const Text(
-                      "Fechar",
-                      style: TextStyle(fontSize: 18),
-                    )),
-              ),
+              Container(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    height: 40,
+                    width: screenWidth * 0.5,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SolicitationsPage()),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        primary: Colors.white,
+                        backgroundColor: Colors.green,
+                        shadowColor: Colors.green[900],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        elevation: 5,
+                        textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      child: const Text("Fechar", style: TextStyle(fontSize: 20.0),),
+                    ),
+                  )),
             ],
           ),
         ),
@@ -152,7 +176,8 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      resizeToAvoidBottomInset: false, //floatingActionButtonLocation fixed on bottom
+      resizeToAvoidBottomInset: false,
+      //floatingActionButtonLocation fixed on bottom
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -163,19 +188,20 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
         ),
         backgroundColor: Colors.black87,
       ),
-      body:
-      Stack(
+      body: Stack(
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
             decoration: const BoxDecoration(color: Colors.black87),
           ),
-          loading ? SizedBox(
-            height: MediaQuery.of(context).size.height / 1.3,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          )  : buildForm()
+          loading
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height / 1.3,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : buildForm()
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -190,14 +216,16 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
                   primary: Colors.lightGreen[900],
                 ),
                 onPressed: () {
-                  if(_formKey.currentState!.validate()){
+                  if (_formKey.currentState!.validate()) {
                     create();
                   }
                 },
-                child: loadingCreate ? const CircularProgressIndicator() : const Text(
-                  'Salvar',
-                  style: TextStyle(fontSize: 20),
-                ),
+                child: loadingCreate
+                    ? const CircularProgressIndicator()
+                    : const Text(
+                        'Salvar',
+                        style: TextStyle(fontSize: 20),
+                      ),
               ))),
     );
   }
@@ -304,52 +332,60 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
     );
   }
 
-  Widget containerSector(context){
+  Widget containerSector(context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       clipBehavior: Clip.none,
       fit: StackFit.loose,
       children: [
         Container(
-          width: screenWidth,
-          height: 300,
-          padding: const EdgeInsets.only(
-              left: 20, top: 20, right: 20, bottom: 20),
-          decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: const Color(0xFF22223b),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
-              ]
-          ),
-          child: Column(
-            children: [
-              const Padding(padding: EdgeInsets.all(10), child: Text("Selecione o setor",
-                style: TextStyle(color: Colors.white, fontSize: 20.0),),),
-              ListView.builder(
-                itemCount: data.length,
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int index) {
-                  dynamic resp = data[index];
-                  return RadioListTile<dynamic>(
-                    title: Text(resp["name"], style: const TextStyle(color: Colors.white),),
-                    value: resp,
-                    groupValue: sectorModelSelected,
-                    onChanged: (dynamic value) {
-                      setState(() {
-                        sectorModelSelected = value;
-                        sectorController.text = value["name"];
-                        Navigator.pop(context);
-                      });
-                    },
-                  );
-                },
-              ),
-            ],
-          )
-        ),
+            width: screenWidth,
+            height: 300,
+            padding:
+                const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+            decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: const Color(0xFF22223b),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Colors.black,
+                      offset: Offset(0, 10),
+                      blurRadius: 10),
+                ]),
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    "Selecione o setor",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
+                ),
+                ListView.builder(
+                  itemCount: data.length,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    dynamic resp = data[index];
+                    return RadioListTile<dynamic>(
+                      title: Text(
+                        resp["name"],
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      value: resp,
+                      groupValue: sectorModelSelected,
+                      onChanged: (dynamic value) {
+                        setState(() {
+                          sectorModelSelected = value;
+                          sectorController.text = value["name"];
+                          Navigator.pop(context);
+                        });
+                      },
+                    );
+                  },
+                ),
+              ],
+            )),
       ],
     );
   }
