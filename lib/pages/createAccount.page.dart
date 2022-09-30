@@ -6,6 +6,7 @@ import 'package:help_desck_app/models/sector.model.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:help_desck_app/pages/login.page.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:help_desck_app/widgets/dialog.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -53,16 +54,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           width: screenWidth,
           height: 300,
           padding:
-          const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+              const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: const Color(0xFF22223b),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(0, 10),
-                    blurRadius: 10),
+                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
               ]),
           child: Column(
             children: [
@@ -79,7 +78,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 itemBuilder: (BuildContext context, int index) {
                   dynamic resp = data[index];
                   return RadioListTile<dynamic>(
-                    title: Text(resp["name"], style: const TextStyle(color: Colors.white),),
+                    title: Text(
+                      resp["name"],
+                      style: const TextStyle(color: Colors.white),
+                    ),
                     value: resp,
                     groupValue: sectorModelSelected,
                     onChanged: (dynamic value) {
@@ -122,8 +124,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
     var response = await UserApi.createAccount(body);
 
-    print(response.body);
-
     if (response.statusCode == 412) {
       setState(() {
         loadingCreate = false;
@@ -144,101 +144,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         context: context,
         barrierDismissible: true, // user must tap button!
         builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            child: contentBox(context),
-          );
-        });
-  }
-
-  contentBox(context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Stack(
-      children: <Widget>[
-        Container(
-          width: screenWidth,
-          height: 250,
-          padding: const EdgeInsets.only(
-              left: 20, top: 45 + 20, right: 20, bottom: 20),
-          margin: const EdgeInsets.only(top: 45),
-          decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: const Color(0xFF22223b),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
-              ]),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Text(
-                "Sucesso!",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              const Text(
-                "Conta criada com sucesso!",
-                style: TextStyle(fontSize: 20, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 22,
-              ),
-              Container(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    height: 40,
-                    width: screenWidth * 0.5,
-                    child: TextButton(
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor: Colors.green,
-                          shadowColor: Colors.green[900],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                          elevation: 5,
-                          textStyle: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const Login()),
-                          );
-                        },
-                        child: const Text(
-                          "Fazer login",
-                          style: TextStyle(fontSize: 18),
-                        )),
-                  )
-              )
-            ],
-          ),
-        ),
-        Positioned(
-          left: 20,
-          right: 20,
-          child: CircleAvatar(
-            backgroundColor: Colors.transparent,
-            radius: 45,
-            child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(45)),
-                child: Image.asset("assets/success.png")),
-          ),
-        )
-      ],
-    );
+          return customDialog(context, 'Sucesso!', 'Conta criada com sucesso!',
+              'Fazer login', true);
+        }).then((_) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+      );
+    });
   }
 
   @override

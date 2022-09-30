@@ -3,6 +3,7 @@ import 'package:help_desck_app/api/user.api.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:help_desck_app/pages/createAccount.page.dart';
 import 'package:help_desck_app/pages/solicitations.page.dart';
+import 'package:help_desck_app/widgets/dialog.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -53,98 +54,9 @@ class _LoginState extends State<Login> {
         context: context,
         barrierDismissible: true, // user must tap button!
         builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            child: contentBox(context),
-          );
+          return customDialog(context, 'Atenção!',
+              'Usuário e/ou senha incorretos', 'Fechar', false);
         });
-  }
-
-  contentBox(context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Stack(
-      children: <Widget>[
-        Container(
-          width: screenWidth,
-          height: 250,
-          padding: const EdgeInsets.only(
-              left: 20, top: 45 + 20, right: 20, bottom: 20),
-          margin: const EdgeInsets.only(top: 45),
-          decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: const Color(0xFF22223b),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
-              ]),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              const Text(
-                "Atenção!",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              const Text(
-                "Usuário e/ou senha incorretos",
-                style: TextStyle(fontSize: 20, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 22,
-              ),
-              Container(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    height: 40,
-                    width: screenWidth * 0.5,
-                    child: TextButton(
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor: Colors.green,
-                          shadowColor: Colors.green[900],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                          elevation: 5,
-                          textStyle: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
-                          "Fechar",
-                          style: TextStyle(fontSize: 18),
-                        )),
-                  )
-              )
-            ],
-          ),
-        ),
-        Positioned(
-          left: 20,
-          right: 20,
-          child: CircleAvatar(
-            backgroundColor: Colors.transparent,
-            radius: 45,
-            child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(45)),
-                child: Image.asset("assets/close.png")),
-          ),
-        )
-      ],
-    );
   }
 
   @override
