@@ -244,59 +244,63 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
 
   Widget containerSector(context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return Stack(
-      clipBehavior: Clip.none,
-      fit: StackFit.loose,
-      children: [
-        Container(
-            width: screenWidth,
-            height: 300,
-            padding:
-                const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-            decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: const Color(0xFF22223b),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(0, 10),
-                      blurRadius: 10),
-                ]),
-            child: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    "Selecione o setor",
-                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+    return SizedBox(
+      height: 300,
+      child: Stack(
+        clipBehavior: Clip.none,
+        fit: StackFit.loose,
+        children: [
+          Container(
+              width: screenWidth,
+              height: 300,
+              padding:
+              const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+              decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  color: const Color(0xFF22223b),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Colors.black,
+                        offset: Offset(0, 10),
+                        blurRadius: 10),
+                  ]),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      "Selecione o setor",
+                      style: TextStyle(color: Colors.white, fontSize: 20.0),
+                    ),
                   ),
-                ),
-                ListView.builder(
-                  itemCount: data.length,
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context, int index) {
-                    dynamic resp = data[index];
-                    return RadioListTile<dynamic>(
-                      title: Text(
-                        resp["name"],
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      value: resp,
-                      groupValue: sectorModelSelected,
-                      onChanged: (dynamic value) {
-                        setState(() {
-                          sectorModelSelected = value;
-                          sectorController.text = value["name"];
-                          Navigator.pop(context);
-                        });
-                      },
-                    );
-                  },
-                ),
-              ],
-            )),
-      ],
+                  Expanded(child: ListView.builder(
+                    itemCount: data.length,
+                    shrinkWrap: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      dynamic resp = data[index];
+                      return RadioListTile<dynamic>(
+                        title: Text(
+                          resp["name"],
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        value: resp,
+                        groupValue: sectorModelSelected,
+                        onChanged: (dynamic value) {
+                          setState(() {
+                            sectorModelSelected = value;
+                            sectorController.text = value["name"];
+                            Navigator.pop(context);
+                          });
+                        },
+                      );
+                    },
+                  ),)
+                ],
+              )),
+        ],
+      ),
     );
   }
 }

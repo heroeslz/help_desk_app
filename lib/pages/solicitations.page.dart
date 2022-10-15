@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/globalVariable.dart';
 import 'package:help_desck_app/pages/createSolicitation.page.dart';
 import 'package:help_desck_app/pages/login.page.dart';
+import 'package:help_desck_app/pages/sectors.page.dart';
 import 'package:help_desck_app/pages/solicitationDetail.page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,10 +21,27 @@ class SolicitationsPage extends StatefulWidget {
 class _SolicitationsState extends State<SolicitationsPage> {
   late bool closeSolicitations = true;
   late bool loadingData = false;
-
+  late String userType = '';
+  late bool loadingApp = false;
   List solicitations = [];
 
   late int sizeList = 0;
+
+  void getUserType() async {
+    setState(() {
+      loadingApp = true;
+    });
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String? userTypeLocal = _prefs.getString('user_type');
+    userType = userTypeLocal!;
+    if (kDebugMode) {
+      print(userType);
+    }
+
+    setState(() {
+      loadingApp = false;
+    });
+  }
 
   Future<String> getSolicitationsOpen() async {
     setState(() {
@@ -89,6 +108,7 @@ class _SolicitationsState extends State<SolicitationsPage> {
   @override
   void initState() {
     super.initState();
+    getUserType();
     getSolicitationsOpen();
   }
 
@@ -148,24 +168,64 @@ class _SolicitationsState extends State<SolicitationsPage> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
+      floatingActionButton: loadingApp ? const SizedBox(width: 0.0, height: 0.0,) : Container(
           width: screenWidth,
           padding: const EdgeInsets.all(10),
-          child: SizedBox(
-              width: screenWidth,
-              height: 60,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.lightGreen[900],
-                ),
-                onPressed: () {
-                  createSolicitation();
-                },
-                child: const Text(
-                  'Nova solicitação',
-                  style: TextStyle(fontSize: 20),
-                ),
-              ))),
+          child: userType == 'USER'
+              ? SizedBox(
+                  width: screenWidth,
+                  height: 60,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.lightGreen[900],
+                    ),
+                    onPressed: () {
+                      createSolicitation();
+                    },
+                    child: const Text(
+                      'Nova solicitação',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ))
+              : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                        width: screenWidth * 0.44,
+                        height: 60,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.lightGreen[900],
+                          ),
+                          onPressed: () {
+                            createSolicitation();
+                          },
+                          child: const Text(
+                            'Nova solicitação',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        )),
+                    SizedBox(
+                        width: screenWidth * 0.44,
+                        height: 60,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.blueAccent[900],
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SectorsPage()),
+                            );
+                          },
+                          child: const Text(
+                            'Setores',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ))
+                  ],
+                )),
     );
   }
 
@@ -297,8 +357,7 @@ class _SolicitationsState extends State<SolicitationsPage> {
                               color: Color.fromARGB(255, 103, 101, 101),
                             ),
                           ),
-                        )
-                      )
+                        ))
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                         itemCount: solicitations.length,

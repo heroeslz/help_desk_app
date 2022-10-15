@@ -90,4 +90,14 @@ class SolutionCreateModel{
   }
 }
 
+class SectorCreateModel{
+  String? name;
+
+  Map toJson() {
+    Map<String, dynamic> sector = {
+      'name': name.toString(),
+    };
+    return sector;
+  }
+}
 

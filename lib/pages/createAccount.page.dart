@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/sector.api.dart';
 import 'package:help_desck_app/api/user.api.dart';
@@ -7,6 +8,7 @@ import 'package:help_desck_app/models/user.dart';
 import 'package:help_desck_app/pages/login.page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:help_desck_app/widgets/dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -72,7 +74,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   style: TextStyle(color: Colors.white, fontSize: 20.0),
                 ),
               ),
-              ListView.builder(
+              Expanded(child: ListView.builder(
                 itemCount: data.length,
                 shrinkWrap: true, // <-- Set this to true
                 itemBuilder: (BuildContext context, int index) {
@@ -93,7 +95,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     },
                   );
                 },
-              ),
+              ),)
             ],
           ),
         )
@@ -124,6 +126,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
     var response = await UserApi.createAccount(body);
 
+    var jsonResponse = json.decode(response.body);
+
+    if (kDebugMode) {print(jsonResponse);}
+
     if (response.statusCode == 412) {
       setState(() {
         loadingCreate = false;
@@ -135,6 +141,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       setState(() {
         loadingCreate = false;
       });
+
       messageDialog();
     }
   }
@@ -192,21 +199,22 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
         width: screenWidth,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
-              child: Image.network(
-                  "https://www.extranet.ceuma.br/hotsite/img/logo.png"),
-            ),
             const Text(
               "Ceuma Desk",
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 22,
                   decoration: TextDecoration.none),
+            ),
+            SizedBox(
+              width: 300,
+              child: Image.asset("assets/ceuma.png"),
             ),
           ],
         ));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/solicitations.api.dart';
 import 'package:help_desck_app/models/solicitation.model.dart';
+import 'package:help_desck_app/pages/solicitations.page.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -364,6 +365,20 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
         centerTitle: true,
         backgroundColor: const Color.fromARGB(200, 0, 0, 0),
         toolbarHeight: 100,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const SolicitationsPage()),
+            );
+          },
+        ),
         title: const Text(
           "Solicitação",
           style: TextStyle(fontSize: 24),

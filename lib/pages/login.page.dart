@@ -1,9 +1,13 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/user.api.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:help_desck_app/pages/createAccount.page.dart';
 import 'package:help_desck_app/pages/solicitations.page.dart';
 import 'package:help_desck_app/widgets/dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -25,10 +29,15 @@ class _LoginState extends State<Login> {
 
     UserRequest userRequest = UserRequest();
 
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+
     userRequest.email = emailController.text;
     userRequest.password = passwordController.text;
 
     var response = await UserApi.login(userRequest);
+
+    var jsonResponse = json.decode(response.body);
+    if (kDebugMode) { print(jsonResponse); }
 
     if(response.statusCode == 201){
       setState(() {
@@ -36,6 +45,8 @@ class _LoginState extends State<Login> {
         emailController.text = "";
         passwordController.text = "";
       });
+
+      await _prefs.setString('user_type', jsonResponse["user"]["user_type"]);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const SolicitationsPage()),
@@ -93,21 +104,26 @@ class _LoginState extends State<Login> {
   Widget circleImage() {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      margin: const EdgeInsets.only(bottom: 30),
-      width: screenWidth,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Padding(padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),child: Image.network("https://www.extranet.ceuma.br/hotsite/img/logo.png"),),
-          const Text(
-            "Ceuma Desk",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.white, fontSize: 20, decoration: TextDecoration.none),
-          ),
-        ],
-      )
-    );
+        width: screenWidth,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Ceuma Desk",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  decoration: TextDecoration.none),
+            ),
+            SizedBox(
+              width: 300,
+              child: Image.asset("assets/ceuma.png"),
+            ),
+          ],
+        ));
   }
 
   Widget form() {
