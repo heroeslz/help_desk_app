@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/solicitations.api.dart';
 import 'package:help_desck_app/models/solicitation.model.dart';
 import 'package:help_desck_app/pages/solicitations.page.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SolicitationDetailPage extends StatefulWidget {
   final int solicitationId;
@@ -18,9 +21,10 @@ class SolicitationDetailPage extends StatefulWidget {
 class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   late Future<SolicitationModel> solicitation;
   late bool loading = true;
+  late String userType = '';
 
   bool loadingSubmit = false;
-  late bool loadingClose  = false;
+  late bool loadingClose = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController solutionDescriptionController = TextEditingController();
@@ -30,6 +34,15 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
       solicitation = SolicitationApi.getSolicitationById(widget.solicitationId);
       loading = false;
     });
+  }
+
+  void getUserType() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String? userTypeLocal = _prefs.getString('user_type');
+    userType = userTypeLocal!;
+    if (kDebugMode) {
+      print(userType);
+    }
   }
 
   createNewSolution() async {
@@ -57,8 +70,6 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
           fontSize: 16.0,
         );
       });
-
-      Navigator.pop(context);
       getSolicitation();
     } else {
       setState(() {
@@ -73,7 +84,6 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      Navigator.pop(context);
     }
   }
 
@@ -82,7 +92,8 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
       loadingClose = true;
     });
 
-    var response = await SolicitationApi.resolveSolicitation(widget.solicitationId);
+    var response =
+        await SolicitationApi.resolveSolicitation(widget.solicitationId);
 
     if (response.statusCode == 200) {
       dialogMessage(true);
@@ -138,9 +149,9 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
       children: <Widget>[
         Container(
           width: screenWidth,
-          height: 300,
-          padding: const EdgeInsets.only(
-              left: 20, top: 20, right: 20, bottom: 20),
+          height: 320,
+          padding:
+              const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: const Color(0xFF22223b),
@@ -148,14 +159,16 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
               boxShadow: const [
                 BoxShadow(
                     color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
-              ]
-          ),
+              ]),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text(
                 "Nova solução",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white),
               ),
               const SizedBox(
                 height: 15,
@@ -164,24 +177,28 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
                 key: _formKey,
                 child: TextFormField(
                   maxLines: 5,
-                  controller:  solutionDescriptionController,
+                  controller: solutionDescriptionController,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   decoration: InputDecoration(
-                    hintStyle: const TextStyle(fontSize: 18.0, color: Colors.white),
+                    hintStyle:
+                        const TextStyle(fontSize: 18.0, color: Colors.white),
                     fillColor: const Color.fromARGB(80, 0, 0, 0),
                     filled: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+                      borderSide: const BorderSide(
+                          color: Colors.transparent, width: 0.0),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: const BorderSide(color: Colors.transparent),
                     ),
-                    errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
+                    errorStyle:
+                        const TextStyle(color: Colors.white, fontSize: 18),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+                      borderSide: const BorderSide(
+                          color: Colors.transparent, width: 0.0),
                     ),
                     hintText: 'Você deve informar uma solução para o problema',
                   ),
@@ -198,54 +215,51 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
               const SizedBox(
                 height: 10,
               ),
-               Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: screenWidth * 0.3,
-                      height: 45,
-                      padding: const EdgeInsets.all(2),
-                      child: TextButton(
-                          onPressed: () {
-                            if(_formKey.currentState!.validate()){
-                              createNewSolution();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.green[900],
-                          ),
-                          child: loadingSubmit ? const SizedBox(
-                            child: CircularProgressIndicator( valueColor: AlwaysStoppedAnimation<Color>(Colors.white), strokeWidth: 2.0),
-                            height: 14,
-                            width: 14,
-                          ) :  const Text(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    width: screenWidth * 0.3,
+                    height: 45,
+                    padding: const EdgeInsets.all(2),
+                    child: TextButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            Navigator.of(context).pop();
+                            createNewSolution();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.green[900],
+                        ),
+                        child: const SizedBox(
+                          child: Text(
                             "Salvar",
                             style: TextStyle(fontSize: 18, color: Colors.white),
-                          )
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      width: screenWidth * 0.3,
-                      height: 45,
-                      child: TextButton(
-                          onPressed: () {
-                            loadingSubmit ? null :
-                            Navigator.of(context).pop();
-                            setState(() {
-                              solutionDescriptionController.text = "";
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.red[900],
                           ),
-                          child: const Text(
-                            "Canelar",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          )),
-                    )
-                  ],
-                )
+                        )),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    width: screenWidth * 0.3,
+                    height: 45,
+                    child: TextButton(
+                        onPressed: () {
+                          loadingSubmit ? null : Navigator.of(context).pop();
+                          setState(() {
+                            solutionDescriptionController.text = "";
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red[900],
+                        ),
+                        child: const Text(
+                          "Canelar",
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        )),
+                  )
+                ],
+              )
             ],
           ),
         ),
@@ -278,47 +292,51 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
             children: <Widget>[
               Text(
                 success ? 'Sucesso!' : 'Atenção',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+                style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white),
               ),
               const SizedBox(
                 height: 15,
               ),
               Text(
-                success ? "Solicitação finalizada com sucesso!" : 'Não foi possível encerrar esta solicitação',
+                success
+                    ? "Solicitação finalizada com sucesso!"
+                    : 'Não foi possível encerrar esta solicitação',
                 style: const TextStyle(fontSize: 20, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(
                 height: 22,
               ),
-             Container(
-               alignment: Alignment.center,
-               child: SizedBox(
-                 height: 40,
-                 width: screenWidth * 0.5,
-                 child: TextButton(
-                     style: TextButton.styleFrom(
-                       primary: Colors.white,
-                       backgroundColor: Colors.green,
-                       shadowColor: Colors.green[900],
-                       shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(28),
-                       ),
-                       elevation: 5,
-                       textStyle: const TextStyle(
-                           color: Colors.white,
-                           fontSize: 30,
-                           fontWeight: FontWeight.w600),
-                     ),
-                     onPressed: () {
-                       Navigator.of(context).pop();
-                     },
-                     child: const Text(
-                       "Fechar",
-                       style: TextStyle(fontSize: 18),
-                     )),
-               )
-             )
+              Container(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    height: 40,
+                    width: screenWidth * 0.5,
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: Colors.green,
+                          shadowColor: Colors.green[900],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          elevation: 5,
+                          textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          "Fechar",
+                          style: TextStyle(fontSize: 18),
+                        )),
+                  ))
             ],
           ),
         ),
@@ -330,7 +348,9 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
             radius: 45,
             child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(45)),
-                child: success ? Image.asset("assets/success.png") : Image.asset("assets/close.png")),
+                child: success
+                    ? Image.asset("assets/success.png")
+                    : Image.asset("assets/close.png")),
           ),
         )
       ],
@@ -340,6 +360,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
   @override
   void initState() {
     super.initState();
+    getUserType();
     getSolicitation();
   }
 
@@ -460,9 +481,11 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
               return SizedBox(
                   height: MediaQuery.of(context).size.height / 1.3,
                   child: const Center(
-                    child: Text("Não foi possível retornar dos dados", style: TextStyle(color: Colors.white, fontSize: 20),),
-                  )
-              );
+                    child: Text(
+                      "Não foi possível retornar dos dados",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ));
             }
             return SizedBox(
               height: MediaQuery.of(context).size.height / 1.3,
@@ -690,41 +713,52 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
             decoration: const BoxDecoration(
               color: Color(0xff333533),
             ),
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: resp.solutions!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  dynamic solution = resp.solutions![index];
-                  return ListTile(
-                    title: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${index + 1} - ${solution["description"]}",
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.white),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  0.0, 10.0, 0.0, 0.0),
-                              child: Text(
-                                "Registrado em ${formatDate(resp.created_at)} às ${formatHour(resp.created_at)}",
-                                style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Text("Usuário: ${solution["user"]["name"]}",
-                                style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold)),
-                          ],
-                        )),
-                  );
-                }))
+            child: loadingSubmit
+                ? const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: SizedBox(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      height: 30.0,
+                      width: 20.0,
+                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: resp.solutions!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      dynamic solution = resp.solutions![index];
+                      return ListTile(
+                        title: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${index + 1} - ${solution["description"]}",
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.white),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      0.0, 10.0, 0.0, 0.0),
+                                  child: Text(
+                                    "Registrado em ${formatDate(resp.created_at)} às ${formatHour(resp.created_at)}",
+                                    style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Text("Usuário: ${solution["user"]["name"]}",
+                                    style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            )),
+                      );
+                    }))
         : const SizedBox(
             width: 0.0,
             height: 0.0,
@@ -766,7 +800,7 @@ class _SolicitationDetailPageState extends State<SolicitationDetailPage> {
 
   Widget createSolution(SolicitationModel resp) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return resp.status == 'OPEN'
+    return (resp.status == 'OPEN' && userType == 'ADMIN')
         ? Container(
             width: screenWidth * 0.9,
             padding: const EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 0.0),

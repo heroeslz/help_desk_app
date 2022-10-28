@@ -6,9 +6,11 @@ import 'package:help_desck_app/api/user.api.dart';
 import 'package:help_desck_app/models/sector.model.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:help_desck_app/pages/login.page.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:help_desck_app/widgets/dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:help_desck_app/widgets/email.dart';
+import 'package:help_desck_app/widgets/password.dart';
+import 'package:help_desck_app/widgets/sectorField.dart';
+import 'package:help_desck_app/widgets/userName.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -19,19 +21,19 @@ class CreateAccountPage extends StatefulWidget {
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
   late bool loading = false;
-
   late bool loadingCreate = false;
-
   late bool comunUser = true;
+
+  // final sectorModelSelected = ValueNotifier('');
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController sectorController = TextEditingController();
   TextEditingController userTypeController = TextEditingController();
-
+  final ValueNotifier<dynamic> sectorFinal = ValueNotifier<dynamic>('');
   dynamic sectorModelSelected;
-
   late Future<dynamic> sectorOptions;
   List data = [];
 
@@ -48,66 +50,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     });
   }
 
-  Widget selectSector(context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Stack(
-      children: [
-        Container(
-          width: screenWidth,
-          height: 300,
-          padding:
-              const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-          decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: const Color(0xFF22223b),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
-              ]),
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  "Selecione o setor",
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
-                ),
-              ),
-              Expanded(child: ListView.builder(
-                itemCount: data.length,
-                shrinkWrap: true, // <-- Set this to true
-                itemBuilder: (BuildContext context, int index) {
-                  dynamic resp = data[index];
-                  return RadioListTile<dynamic>(
-                    title: Text(
-                      resp["name"],
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    value: resp,
-                    groupValue: sectorModelSelected,
-                    onChanged: (dynamic value) {
-                      setState(() {
-                        sectorModelSelected = value;
-                        sectorController.text = value["name"];
-                        Navigator.pop(context);
-                      });
-                    },
-                  );
-                },
-              ),)
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
   @override
   void initState() {
     super.initState();
     getSectors();
   }
+
 
   createAccount() async {
     setState(() {
@@ -116,18 +64,19 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
     UserModel body = UserModel();
     SectorModel sectorModel = SectorModel(
-        sector_id: sectorModelSelected["sector_id"],
-        name: sectorModelSelected["name"]);
+        sector_id: sectorFinal.value["sector_id"],
+        name: sectorFinal.value["name"]);
     body.sector = sectorModel;
     body.email = emailController.text;
     body.password = passwordController.text;
     body.name = nameController.text;
-    body.user_type = comunUser ? 'USER' : 'ADMIN';
+    body.user_type = 'USER';
 
+    setState(() {
+      loadingCreate = false;
+    });
     var response = await UserApi.createAccount(body);
-
     var jsonResponse = json.decode(response.body);
-
     if (kDebugMode) {print(jsonResponse);}
 
     if (response.statusCode == 412) {
@@ -135,13 +84,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         loadingCreate = false;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Email já cadastrado')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Email já cadastrado')));
     } else if (response.statusCode == 201) {
       setState(() {
         loadingCreate = false;
       });
-
       messageDialog();
     }
   }
@@ -237,23 +184,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           key: _formKey,
           child: Column(
             children: [
-              nameField(),
-              emailField(),
-              passwordField(),
-              sectorField(),
-              SwitchListTile(
-                title: const Text(
-                  'Usuário comum',
-                  style: TextStyle(color: Colors.white),
-                ),
-                value: comunUser,
-                onChanged: (bool value) {
-                  setState(() {
-                    comunUser = value;
-                  });
-                },
-                secondary: const Icon(Icons.person, color: Colors.green),
-              ),
+              nameField(nameController),
+              emailField(emailController),
+              passwordField(passwordController),
+              ValueListenableBuilder(
+                valueListenable: sectorFinal,
+                  builder: (context, _content, child) {
+                    return sectorField(sectorController, context, sectorFinal, data);
+                  })
             ],
           ),
         ),
@@ -261,182 +199,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
-  Widget emailField() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
-      child: TextFormField(
-        controller: emailController,
-        keyboardType: TextInputType.emailAddress,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
-          fillColor: const Color.fromARGB(80, 0, 0, 0),
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
-          prefixIcon: Icon(
-            Icons.email,
-            color: Colors.lightGreen[900],
-          ),
-          hintText: 'E-mail',
-        ),
-        validator: (String? value) {
-          final bool isValid = EmailValidator.validate(value!);
-          if (value.isEmpty) {
-            return 'Informe um email';
-          } else if (isValid == false) {
-            return 'Informe um email válido';
-          }
-          return null;
-        },
-      ),
-    );
-  }
 
-  Widget nameField() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
-      child: TextFormField(
-        controller: nameController,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
-          fillColor: const Color.fromARGB(80, 0, 0, 0),
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          prefixIcon: Icon(
-            Icons.person,
-            color: Colors.lightGreen[900],
-          ),
-          hintText: 'Nome',
-        ),
-        validator: (String? value) {
-          if (value!.isEmpty) {
-            return 'Informe seu nome';
-          } else if (value.length < 6) {
-            return 'Nome deve ter mais de 6 caracteres';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget passwordField() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
-      child: TextFormField(
-        controller: passwordController,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
-          fillColor: const Color.fromARGB(80, 0, 0, 0),
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          prefixIcon: Icon(
-            Icons.key_rounded,
-            color: Colors.lightGreen[900],
-          ),
-          hintText: 'Senha',
-        ),
-        validator: (String? value) {
-          if (value!.isEmpty) {
-            return 'Informe uma senha';
-          } else if (value.length < 6) {
-            return 'Senha deve ter mais de 6 caracteres';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget sectorField() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
-      child: TextFormField(
-        readOnly: true,
-        controller: sectorController,
-        onTap: () => showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                child: selectSector(context),
-              );
-            }),
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
-          fillColor: const Color.fromARGB(80, 0, 0, 0),
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          ),
-          prefixIcon: Icon(
-            Icons.edit_location,
-            color: Colors.lightGreen[900],
-          ),
-          errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
-          hintText: 'Setor',
-        ),
-        validator: (String? value) {
-          if (value == null || value.isEmpty) {
-            return 'Informe seu setor';
-          }
-          return null;
-        },
-      ),
-    );
-  }
 
   Widget loginButton() {
     double screenWidth = MediaQuery.of(context).size.width;

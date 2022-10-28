@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:help_desck_app/api/sector.api.dart';
 import 'package:help_desck_app/globalVariable.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:http/http.dart';
@@ -34,6 +36,8 @@ class UserApi {
 
     var body = jsonEncode(userRequest);
 
+
+
     final headers = {
       HttpHeaders.contentTypeHeader: 'application/json',
     };
@@ -45,5 +49,65 @@ class UserApi {
     );
 
     return response;
+  }
+
+  static Future<Response> getUsers() async {
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('access_token');
+
+    final headers = {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    };
+    
+    try{
+      Response response = await http.get(Uri.parse('https://help-ceuma.herokuapp.com/user'), headers: headers);
+      return response;
+    }
+    on SocketException {
+      if (kDebugMode) { print('SocketException'); }
+      throw const SocketException('SocketException');
+    }
+    catch(e) {
+      if (kDebugMode) { print(e); }
+      throw AppException('Error');
+    }
+    finally {
+      if (kDebugMode) {
+        print('close');
+      }
+      client.close();
+    }
+  }
+
+  static Future<Response> deleteUser(id) async {
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('access_token');
+
+    final headers = {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    };
+
+    try{
+      Response response = await http.delete(Uri.parse('https://help-ceuma.herokuapp.com/user/$id'), headers: headers);
+      return response;
+    }
+    on SocketException {
+      if (kDebugMode) { print('SocketException'); }
+      throw const SocketException('SocketException');
+    }
+    catch(e) {
+      if (kDebugMode) { print(e); }
+      throw AppException('Error');
+    }
+    finally {
+      if (kDebugMode) {
+        print('close');
+      }
+      client.close();
+    }
   }
 }

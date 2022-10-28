@@ -16,15 +16,13 @@ class CreateSolicitationPage extends StatefulWidget {
 
 class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController sectorController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   late bool loading = false;
   late bool loadingCreate = false;
 
-  TextEditingController sectorController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-
   dynamic sectorModelSelected;
-
   late Future<dynamic> sectorOptions;
   List data = [];
 

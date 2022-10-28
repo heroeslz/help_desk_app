@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/globalVariable.dart';
+import 'package:help_desck_app/pages/admin.dart';
 import 'package:help_desck_app/pages/createSolicitation.page.dart';
 import 'package:help_desck_app/pages/login.page.dart';
-import 'package:help_desck_app/pages/sectors.page.dart';
 import 'package:help_desck_app/pages/solicitationDetail.page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +37,6 @@ class _SolicitationsState extends State<SolicitationsPage> {
     if (kDebugMode) {
       print(userType);
     }
-
     setState(() {
       loadingApp = false;
     });
@@ -184,6 +183,7 @@ class _SolicitationsState extends State<SolicitationsPage> {
                     },
                     child: const Text(
                       'Nova solicitação',
+                      textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 20),
                     ),
                   ))
@@ -203,7 +203,8 @@ class _SolicitationsState extends State<SolicitationsPage> {
                           },
                           child: const Text(
                             'Nova solicitação',
-                            style: TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 18),
                           ),
                         )),
                     SizedBox(
@@ -216,12 +217,12 @@ class _SolicitationsState extends State<SolicitationsPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const SectorsPage()),
+                              MaterialPageRoute(builder: (context) => const AdminPage()),
                             );
                           },
                           child: const Text(
-                            'Setores',
-                            style: TextStyle(fontSize: 20),
+                            'Admin',
+                            style: TextStyle(fontSize: 18),
                           ),
                         ))
                   ],

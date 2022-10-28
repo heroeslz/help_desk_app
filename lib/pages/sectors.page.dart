@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/api/sector.api.dart';
+import 'package:help_desck_app/api/user.api.dart';
 import 'package:help_desck_app/models/solicitation.model.dart';
-import 'package:help_desck_app/pages/solicitations.page.dart';
 
 class SectorsPage extends StatefulWidget {
   const SectorsPage({Key? key}) : super(key: key);
@@ -30,6 +30,12 @@ class _SectorsPageState extends State<SectorsPage> {
     });
   }
 
+  void getUser() async {
+    var response = await UserApi.getUsers();
+    var resBody = json.decode(response.body);
+    print(resBody);
+  }
+
   void createSector() async {
     setState(() {
       loading = true;
@@ -55,36 +61,12 @@ class _SectorsPageState extends State<SectorsPage> {
   void initState() {
     super.initState();
     getSectors();
+    getUser();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        toolbarHeight: 100,
-        backgroundColor: const Color.fromARGB(200, 0, 0, 0),
-        title: const Text(
-          "Setores",
-          style: TextStyle(fontSize: 30),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.green,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const SolicitationsPage()),
-              );
-            },
-          ),
-        ],
-      ),
       body: Stack(
         children: [
           Container(

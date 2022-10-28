@@ -12,7 +12,6 @@ import '../models/solicitation.model.dart';
 class SectorApi {
   static Future<Response> getSectors() async {
     var client = http.Client();
-    if (kDebugMode) print('aqui');
     final headers = {
       HttpHeaders.contentTypeHeader: 'application/json',
     };
@@ -62,6 +61,7 @@ class AppException implements Exception {
 
   AppException([this._message, this._prefix]);
 
+  @override
   String toString() {
     return "$_prefix$_message";
   }
