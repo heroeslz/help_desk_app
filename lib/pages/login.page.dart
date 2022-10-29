@@ -6,9 +6,10 @@ import 'package:help_desck_app/api/user.api.dart';
 import 'package:help_desck_app/models/user.dart';
 import 'package:help_desck_app/pages/createAccount.page.dart';
 import 'package:help_desck_app/pages/solicitations.page.dart';
+import 'package:help_desck_app/pages/splashScreen.dart';
 import 'package:help_desck_app/widgets/dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/services.dart';
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
@@ -49,7 +50,7 @@ class _LoginState extends State<Login> {
       await _prefs.setString('user_type', jsonResponse["user"]["user_type"]);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SolicitationsPage()),
+        MaterialPageRoute(builder: (context) => const SplashScreen()),
       );
     }else if(response.statusCode == 403){
       setState(() {
@@ -68,6 +69,12 @@ class _LoginState extends State<Login> {
           return customDialog(context, 'Atenção!',
               'Usuário e/ou senha incorretos', 'Fechar', false);
         });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:help_desck_app/pages/login.page.dart';
+import 'package:help_desck_app/pages/splashScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const Login(),
+      home: const SplashScreen(),
     );
   }
 }
