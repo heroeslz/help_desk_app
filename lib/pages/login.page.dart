@@ -50,7 +50,7 @@ class _LoginState extends State<Login> {
       await _prefs.setString('user_type', jsonResponse["user"]["user_type"]);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SplashScreen()),
+        MaterialPageRoute(builder: (context) => const SolicitationsPage()),
       );
     }else if(response.statusCode == 403){
       setState(() {
