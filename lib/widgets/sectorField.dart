@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 
-Widget sectorField(sectorController, context, sectorFinal, data) {
+Widget sectorField(sectorController, context, sectorFinal, data, loading) {
   return Padding(
     padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
     child: TextFormField(
       readOnly: true,
       controller: sectorController,
-      onTap: () => showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            double screenWidth = MediaQuery.of(context).size.width;
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              child: selectSector(context, sectorFinal, data, sectorController)
-            );
-          }),
+      onTap: () => {
+          if(loading){
+            null,
+          }else{
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  double screenWidth = MediaQuery.of(context).size.width;
+                  return Dialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      child: selectSector(context, sectorFinal, data, sectorController)
+                  );
+                }),
+          }
+      },
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
@@ -40,6 +46,10 @@ Widget sectorField(sectorController, context, sectorFinal, data) {
           Icons.edit_location,
           color: Colors.lightGreen[900],
         ),
+        suffixIcon: loading ? Transform.scale(
+          scale: 0.5,
+          child: const CircularProgressIndicator(),
+        ) : null,
         errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
         hintText: 'Setor',
       ),

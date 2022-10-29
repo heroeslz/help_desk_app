@@ -102,14 +102,7 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
             padding: const EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
             decoration: const BoxDecoration(color: Colors.black87),
           ),
-          loading
-              ? SizedBox(
-                  height: MediaQuery.of(context).size.height / 1.3,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : buildForm()
+          buildForm()
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -198,18 +191,27 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
       child: TextFormField(
         readOnly: true,
         controller: sectorController,
-        onTap: () => showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                child: containerSector(context),
-              );
-            }),
+        onTap: () => {
+          if (loading)
+            {
+              null,
+            }
+          else
+            {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      child: containerSector(context),
+                    );
+                  }),
+            }
+        },
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintStyle: const TextStyle(fontSize: 20.0, color: Colors.white),
@@ -228,6 +230,12 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
             borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
           ),
           errorStyle: const TextStyle(color: Colors.white, fontSize: 18),
+          suffixIcon: loading
+              ? Transform.scale(
+                  scale: 0.5,
+                  child: const CircularProgressIndicator(),
+                )
+              : null,
           hintText: 'Setor onde está o problema',
         ),
         validator: (String? value) {
@@ -251,8 +259,8 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
           Container(
               width: screenWidth,
               height: 300,
-              padding:
-              const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+              padding: const EdgeInsets.only(
+                  left: 20, top: 20, right: 20, bottom: 20),
               decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
                   color: const Color(0xFF22223b),
@@ -273,28 +281,30 @@ class _CreateSolicitationPageState extends State<CreateSolicitationPage> {
                       style: TextStyle(color: Colors.white, fontSize: 20.0),
                     ),
                   ),
-                  Expanded(child: ListView.builder(
-                    itemCount: data.length,
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      dynamic resp = data[index];
-                      return RadioListTile<dynamic>(
-                        title: Text(
-                          resp["name"],
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        value: resp,
-                        groupValue: sectorModelSelected,
-                        onChanged: (dynamic value) {
-                          setState(() {
-                            sectorModelSelected = value;
-                            sectorController.text = value["name"];
-                            Navigator.pop(context);
-                          });
-                        },
-                      );
-                    },
-                  ),)
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: data.length,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        dynamic resp = data[index];
+                        return RadioListTile<dynamic>(
+                          title: Text(
+                            resp["name"],
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          value: resp,
+                          groupValue: sectorModelSelected,
+                          onChanged: (dynamic value) {
+                            setState(() {
+                              sectorModelSelected = value;
+                              sectorController.text = value["name"];
+                              Navigator.pop(context);
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  )
                 ],
               )),
         ],

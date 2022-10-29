@@ -144,14 +144,7 @@ class _CreateUserState extends State<CreateUser> {
           padding: const EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
           decoration: const BoxDecoration(color: Colors.black87),
         ),
-        loading
-            ? SizedBox(
-          height: MediaQuery.of(context).size.height / 1.3,
-          child: const Center(
-            child: CircularProgressIndicator(),
-          ),
-        )
-            : buildForm()
+        buildForm()
       ],
     )
     );
@@ -172,7 +165,7 @@ class _CreateUserState extends State<CreateUser> {
           ValueListenableBuilder(
               valueListenable: sectorFinal,
               builder: (context, _content, child) {
-                return sectorField(sectorController, context, sectorFinal, data);
+                return sectorField(sectorController, context, sectorFinal, data, loading);
               })
         ],
       ),
