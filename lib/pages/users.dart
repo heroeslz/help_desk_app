@@ -23,6 +23,8 @@ class _SectorsPageState extends State<UsersPage> {
     });
     var response = await UserApi.getUsers();
     var resBody = json.decode(response.body);
+
+    print(resBody);
     setState(() {
       data = resBody["users"];
       loading = false;
@@ -169,7 +171,7 @@ class _SectorsPageState extends State<UsersPage> {
                           padding:
                           const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 2.0),
                           child: Text(
-                            "Setor: ${data[index]["sector"]?["name"]}",
+                            "Tipo: ${data[index]["user_type"]}",
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),

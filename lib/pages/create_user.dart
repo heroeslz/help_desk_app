@@ -21,7 +21,6 @@ class CreateUser extends StatefulWidget {
 
 class _CreateUserState extends State<CreateUser> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController sectorController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -29,22 +28,6 @@ class _CreateUserState extends State<CreateUser> {
 
   late bool loading = false;
   late bool loadingCreate = false;
-  dynamic sectorModelSelected;
-  late Future<dynamic> sectorOptions;
-  List data = [];
-
-  void getSectors() async {
-    setState(() {
-      loading = true;
-    });
-    var response = await SectorApi.getSectors();
-
-    var resBody = json.decode(response.body);
-    setState(() {
-      data = resBody["sectors"];
-      loading = false;
-    });
-  }
 
   createAccount() async {
     setState(() {
@@ -52,10 +35,6 @@ class _CreateUserState extends State<CreateUser> {
     });
 
     UserModel body = UserModel();
-    SectorModel sectorModel = SectorModel(
-        sector_id: sectorFinal.value["sector_id"],
-        name: sectorFinal.value["name"]);
-    body.sector = sectorModel;
     body.email = emailController.text;
     body.password = passwordController.text;
     body.name = nameController.text;
@@ -95,7 +74,6 @@ class _CreateUserState extends State<CreateUser> {
   @override
   void initState() {
     super.initState();
-    getSectors();
   }
 
   @override
@@ -159,14 +137,10 @@ class _CreateUserState extends State<CreateUser> {
       key: _formKey,
       child: ListView(
         shrinkWrap: true,
-        children: [   nameField(nameController),
+        children: [
+          nameField(nameController),
           emailField(emailController),
           passwordField(passwordController),
-          ValueListenableBuilder(
-              valueListenable: sectorFinal,
-              builder: (context, _content, child) {
-                return sectorField(sectorController, context, sectorFinal, data, loading);
-              })
         ],
       ),
     );

@@ -24,38 +24,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   late bool loadingCreate = false;
   late bool comunUser = true;
 
-  // final sectorModelSelected = ValueNotifier('');
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController sectorController = TextEditingController();
   TextEditingController userTypeController = TextEditingController();
-  final ValueNotifier<dynamic> sectorFinal = ValueNotifier<dynamic>('');
-  dynamic sectorModelSelected;
-  late Future<dynamic> sectorOptions;
-  List data = [];
-
-  void getSectors() async {
-    setState(() {
-      loading = true;
-    });
-    var response = await SectorApi.getSectors();
-
-    var resBody = json.decode(response.body);
-    setState(() {
-      data = resBody["sectors"];
-      loading = false;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    getSectors();
   }
-
 
   createAccount() async {
     setState(() {
@@ -63,18 +41,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     });
 
     UserModel body = UserModel();
-    SectorModel sectorModel = SectorModel(
-        sector_id: sectorFinal.value["sector_id"],
-        name: sectorFinal.value["name"]);
-    body.sector = sectorModel;
     body.email = emailController.text;
     body.password = passwordController.text;
     body.name = nameController.text;
     body.user_type = 'USER';
 
-    setState(() {
-      loadingCreate = false;
-    });
+
     var response = await UserApi.createAccount(body);
     var jsonResponse = json.decode(response.body);
     if (kDebugMode) {print(jsonResponse);}
@@ -180,11 +152,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               nameField(nameController),
               emailField(emailController),
               passwordField(passwordController),
-              ValueListenableBuilder(
-                valueListenable: sectorFinal,
-                  builder: (context, _content, child) {
-                    return sectorField(sectorController, context, sectorFinal, data, loading);
-                  })
             ],
           ),
         ),

@@ -8,7 +8,6 @@ class UserModel {
    String? user_type;
    String? created_at;
    String? updated_at;
-   SectorModel? sector;
 
   UserModel({
      this.user_id,
@@ -18,7 +17,6 @@ class UserModel {
      this.user_type,
      this.created_at,
      this.updated_at,
-    this.sector
   });
 
   factory UserModel.fromJson(Map<dynamic, dynamic> json) {
@@ -34,13 +32,11 @@ class UserModel {
   }
 
     Map toJson() {
-      Map<String, dynamic> sector = this.sector!.toJson();
       Map<String, dynamic> service = {
         'name': name.toString(),
         'email':email,
         'password': password,
         'user_type': user_type,
-        'sector': sector
       };
       return service;
     }
